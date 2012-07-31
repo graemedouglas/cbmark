@@ -12,6 +12,8 @@
 */
 /******************************************************************************/
 
+#ifndef CBMARK_H
+#define CBMARK_H
 #include <stdio.h>
 
 /* Control structure type containing benchmarking data for a single trial. */
@@ -72,3 +74,5 @@ int endbenchmark(cbm_trial_t *p);
 			contains the time information to be printed.
 */
 void cbm_printresult(cbm_trial_t *p);
+
+#endif
