@@ -44,6 +44,19 @@ typedef struct cbm_trial
 	/*@}*/
 } cbm_trial_t;
 
+/* Determine the resolution of the CPU. */
+/**
+@brief		Determine the resolution of the processor.
+@details	The method determines the resolution of the processor and
+		benchmarking code by doing @p dotimes benchmarks.  The max
+		resolution for each benchmarking field is taken.
+@param		resolution_p	The trial structure that will store the
+				resulting resolutions
+@param		dotimes		The number of times to record a resolution.
+@returns	@c -1 if an error occurs, @c 1 otherwise.
+*/
+int benchmark_getresolution(cbm_trial_t *resolution_p, int dotimes)
+
 /* Start the benchmark for a given trial. */
 /**
 @brief		Begins the benchmark for a given trial.
