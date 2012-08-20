@@ -88,11 +88,28 @@ int test3(void)
 	return 0;
 }
 
+int test4()
+{
+	printf("Getting system resolution.\n");
+	fflush(stdout);
+	//-- General variable declaration.
+	// Resolution trial variable.
+	cbm_trial_t resolution_trial;
+	
+	// Loop variables.
+	int i;
+	
+	benchmark_getresolution(&resolution_trial, 1);
+	cbm_printresult(&resolution_trial);
+	return 0;
+}
+
 // Main Function.
 int main(void)
 {
 	test1();
 	test2();
 	test3();
+	test4();
 	return 0;
 }

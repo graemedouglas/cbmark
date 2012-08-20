@@ -19,11 +19,11 @@ bin/cbmark.o: src/cbmark.c src/cbmark.h
 # Tests
 tests: bin/tests/cbmark_test
 	echo "Build complete!"
-bin/tests/cbmark_test: bin/cbmark.o
+bin/tests/cbmark_test: src/cbmark_test.c bin/cbmark.o
 ifeq ($(CC),gcc)
 	$(CC) -o bin/tests/cbmark_test src/cbmark_test.c bin/cbmark.o $(mygcclibs)
 else
-	$(CC) -o bin/tests/cbmark_test src/cbmark_test.c
+	$(CC) -o bin/tests/cbmark_test src/cbmark_test.c bin/cbmark.o
 endif
 
 # Clean target

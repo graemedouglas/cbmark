@@ -11,19 +11,6 @@
 */
 /******************************************************************************/
 
-/**
-@brief		A ceiling macro for negative numbers.
-*/
-#define CEILING_POS(X) ((X-(int)(X)) > 0 ? (int)(X+1) : (int)(X))
-/**
-@brief		A ceiling macro for positive numbers.
-*/
-#define CEILING_NEG(X) ((X-(int)(X)) < 0 ? (int)(X-1) : (int)(X))
-/**
-@brief		The ceiling macro.
-*/
-#define CEILING(X) ( ((X) > 0) ? CEILING_POS(X) : CEILING_NEG(X) )
-
 #include "cbmark.h"
 #ifdef WIN32
 #include <windows.h>
@@ -33,56 +20,108 @@
 #include <time.h>
 #endif
 
-int benchmark_getresolution(cbm_trial_t *resolution_p, int dotimes)
+/* Utility method that makes calculates the next highest order of magnitude,
+   where
+	0 is order of magnitude 0.
+	1 is order of magnitude 10.
+	7 is order of magnitude 10.
+	10 is order of magnitude 100.
+	11 is order of magnitude 100.
+	... etc ...
+*/
+long orderofmagnitude(long l)
 {
-	if (dotimes < 1)
+	if (l < 0)
+	{
+		return -1;
+	}
+	else if (l == 0)
+	{
+		return 0;
+	}
+	long temp = l;
+	
+	int i;
+	for (i = 0; temp > 0; ++i)
+	{
+		temp /= 10;
+	}
+	
+	temp = 1;
+	for (; i > 0; --i)
+	{
+		temp *= 10;
+	}
+	return temp;
+}
+
+int benchmark_getresolution(cbm_trial_t *resolution_p, int iterations)
+{
+	if (iterations < 1)
 	{
 		// TODO: Print out an error.
 		return -1;
 	}
 	
-	/* Create variables for running averages. */
-	double wctime_sec = 0;
-	double wctime_nsec = 0;
-	double cputime_user_sec = 0;
-	double cputime_user_usec = 0;
-	double cputime_kernel_sec = 0;
-	double cputime_kernel_usec = 0;
+	/* Initialize the resolution structure values. */
+	resolution_p->wctime_sec = 0;
+	resolution_p->wctime_nsec = 0;
+	resolution_p->cputime_user_sec = 0;
+	resolution_p->cputime_user_usec = 0;
+	resolution_p->cputime_kernel_sec = 0;
+	resolution_p->cputime_kernel_usec = 0;
 	
 	cbm_trial_t temp;
 	int i;
-	for (i = 0; i < dotimes; ++i)
+	for (i = 0; i < iterations; ++i)
 	{
 		/* Do a quick benchmark. */
 		startbenchmark(&temp);
 		endbenchmark(&temp);
 		
-		/* Calculate the running average. */
-		wctime_sec = ((wctime_sec * i) + (double)(temp.wctime_sec))
-				/ (double)(i + 1);
-		wctime_nsec = ((wctime_nsec * i) + (double)(temp.wctime_nsec))
-				/ (double)(i + 1);
-		cputime_user_sec = ((cputime_user_sec * i) +
-					(double)(temp.cputime_user_sec))
-					/ (double)(i + 1);
-		cputime_user_usec = ((cputime_user_usec * i) +
-					(double)(temp.cputime_user_usec))
-					/ (double)(i + 1);
-		cputime_kernel_sec = ((cputime_kernel_sec * i) +
-					(double)(temp.cputime_kernel_sec))
-					/ (double)(i + 1);
-		cputime_kernel_usec = ((cputime_kernel_usec * i) +
-					(double)(temp.cputime_kernel_usec))
-					/ (double)(i + 1);
+		/* Calculate the running maximums. */
+		// TODO: maybe abstract this logic into a macro?
+		if (temp.wctime_sec > resolution_p->wctime_sec)
+		{
+			resolution_p->wctime_sec = temp.wctime_sec;
+		}
+		if (temp.wctime_nsec > resolution_p->wctime_nsec)
+		{
+			resolution_p->wctime_nsec = temp.wctime_nsec;
+		}
+		if (temp.cputime_user_sec > resolution_p->cputime_user_sec)
+		{
+			resolution_p->cputime_user_sec = temp.cputime_user_sec;
+		}
+		if (temp.cputime_user_usec > resolution_p->cputime_user_usec)
+		{
+			resolution_p->cputime_user_usec =
+						temp.cputime_user_usec;
+		}
+		if (temp.cputime_kernel_sec > resolution_p->cputime_kernel_sec)
+		{
+			resolution_p->cputime_kernel_sec =
+						temp.cputime_kernel_sec;
+		}
+		if (temp.cputime_kernel_usec >
+				resolution_p->cputime_kernel_usec)
+		{
+			resolution_p->cputime_kernel_usec =
+						temp.cputime_kernel_usec;
+		}
 	}
 	
-	/* Set the resolution structure values. */
-	resolution_p->wctime_sec = CEILING(wctime_sec);
-	resolution_p->wctime_nsec = CEILING(wctime_nsec);
-	resolution_p->cputime_user_sec = CEILING(cputime_user_sec);
-	resolution_p->cputime_user_usec = CEILING(cputime_user_usec);
-	resolution_p->cputime_kernel_sec = CEILING(cputime_kernel_sec);
-	resolution_p->cputime_kernel_usec = CEILING(cputime_kernel_usec);
+	/* Calculate the next highest order of magnitude for each resolution. */
+	resolution_p->wctime_sec = orderofmagnitude(resolution_p->wctime_sec);
+	resolution_p->wctime_nsec = orderofmagnitude(resolution_p->wctime_nsec);
+	resolution_p->cputime_user_sec =
+		orderofmagnitude(resolution_p->cputime_user_sec);
+	resolution_p->cputime_user_usec =
+		orderofmagnitude(resolution_p->cputime_user_usec);
+	resolution_p->cputime_kernel_sec =
+		orderofmagnitude(resolution_p->cputime_kernel_sec);
+	resolution_p->cputime_kernel_usec =
+		orderofmagnitude(resolution_p->cputime_kernel_usec);
 	
 	return 0;
 }
