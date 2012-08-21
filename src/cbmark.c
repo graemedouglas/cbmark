@@ -20,7 +20,7 @@
 #include <time.h>
 #endif
 
-/* Utility method that makes calculates the next highest order of magnitude,
+/* Utility method that calculates the next highest order of magnitude,
    where
 	0 is order of magnitude 0.
 	1 is order of magnitude 10.
@@ -110,6 +110,9 @@ int benchmark_getresolution(cbm_trial_t *resolution_p, int iterations)
 						temp.cputime_kernel_usec;
 		}
 	}
+	
+	/* Get clock resolution, according to hardware, take largest number. */
+	// TODO!!!!!!
 	
 	/* Calculate the next highest order of magnitude for each resolution. */
 	resolution_p->wctime_sec = orderofmagnitude(resolution_p->wctime_sec);

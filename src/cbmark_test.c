@@ -99,7 +99,7 @@ int test4()
 	// Loop variables.
 	int i;
 	
-	benchmark_getresolution(&resolution_trial, 1);
+	benchmark_getresolution(&resolution_trial, 1000);
 	cbm_printresult(&resolution_trial);
 	return 0;
 }
