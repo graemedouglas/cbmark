@@ -137,11 +137,11 @@ int startbenchmark(cbm_trial_t *p)
 	struct timespec wctime;
 	struct rusage cputime;
 	
-	/* Get the wallclock time. */
-	clock_gettime(CLOCK_MONOTONIC, &wctime);
-	
 	/* Get CPU time. */
 	getrusage(RUSAGE_SELF, &cputime);
+	
+	/* Get the wallclock time. */
+	clock_gettime(CLOCK_MONOTONIC, &wctime);
 	
 	/* Set times. */
 	p->wctime_sec = wctime.tv_sec;
